@@ -159,8 +159,8 @@ public class Puente {
     /* ---------- Instalador ---------- */
 
     /**
-     * Petición HTTPS sin las restricciones de origen del WebView, solo hacia GitHub y Cloudflare: el instalador
-     * las necesita para crear la nube de la persona. Responde en window.onNativeHttp(id, status, texto).
+     * Petición HTTPS sin las restricciones de origen del WebView, solo hacia GitHub y Cloudflare (el instalador
+     * las necesita para crear la nube de la persona) y hacia Kilo, la IA gratuita que no pide clave. Responde en window.onNativeHttp(id, status, texto).
      */
     @JavascriptInterface public void http(String id, String method, String url, String headersJson, String body) {
         new Thread(() -> {
@@ -168,11 +168,11 @@ public class Puente {
             String text;
             HttpURLConnection con = null;
             try {
-                if (url == null || !(url.startsWith("https://api.github.com/") || url.startsWith("https://api.cloudflare.com/client/v4/"))) throw new IllegalArgumentException("destino no permitido");
+                if (url == null || !(url.startsWith("https://api.github.com/") || url.startsWith("https://api.cloudflare.com/client/v4/") || url.startsWith("https://api.kilo.ai/api/gateway/"))) throw new IllegalArgumentException("destino no permitido");
                 con = (HttpURLConnection) new URL(url).openConnection();
                 con.setRequestMethod(method);
                 con.setConnectTimeout(20000);
-                con.setReadTimeout(30000);
+                con.setReadTimeout(60000); // la IA sin clave piensa antes de responder: puede tardar medio minuto
                 JSONObject headers = new JSONObject(headersJson == null || headersJson.isEmpty() ? "{}" : headersJson);
                 for (Iterator<String> it = headers.keys(); it.hasNext(); ) { String k = it.next(); con.setRequestProperty(k, headers.getString(k)); }
                 if (body != null && !body.isEmpty()) {

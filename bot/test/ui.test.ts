@@ -49,7 +49,8 @@ describe('Interfaz: explorar mercados', () => {
     expect(sol.querySelector('b')!.textContent).toBe('¿SOL ≥ 109,32 al vencer?');
     expect(sol.textContent).toContain('vence en 6 h 0 min');
     expect(sol.textContent).toContain('creado por Hyperliquid');
-    expect(sol.textContent).toContain('SOL ahora 111,69 (+2,16%)');
+    expect(sol.textContent).toContain('SOL ahora 111,69 ▼ -0,46 % hoy · +2,16 % del objetivo');
+    expect(sol.textContent).toContain('movió 241 USDC hoy');
     const lados = [...sol.querySelectorAll('.pm-lado')].map((l) => l.querySelector('span')!.textContent + ' ' + l.querySelector('b')!.textContent);
     expect(lados).toEqual(['Sí · 98% 0,978', 'No · 2% 0,022']);
     expect(a.q('#pm-estado').textContent).toContain('14 de 14 mercados');
@@ -242,12 +243,12 @@ describe('Lo que se empaqueta en la app', () => {
 
   it('la app Android lleva exactamente la misma interfaz', () => {
     const android = new URL('../../app/android/app/src/main/assets/web/', import.meta.url);
-    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'sellar.js', 'style.css', 'config.js']) expect(readFileSync(new URL(f, android), 'utf8'), f).toBe(leer(f));
+    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'ia.js', 'sellar.js', 'style.css', 'config.js']) expect(readFileSync(new URL(f, android), 'utf8'), f).toBe(leer(f));
   });
 
   it('la edición pública no lleva datos de nadie', () => {
     expect(leer('config.js')).toContain("api: ''");
-    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'config.js']) {
+    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'ia.js', 'config.js']) {
       expect(leer(f), f).not.toMatch(/0x1c22/i);
       expect(leer(f), f).not.toMatch(/[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev/); // ninguna nube concreta
     }

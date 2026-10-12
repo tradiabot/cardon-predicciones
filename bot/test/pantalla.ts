@@ -51,7 +51,7 @@ export async function abrir(op: Op = {}) {
     const original = w.NUCLEO.crearPlataformas;
     w.NUCLEO = { ...w.NUCLEO, crearPlataformas: (entorno: any) => [...original(entorno), crearFalsa({ fetch: sim.red, ahora: () => AHORA })] };
   }
-  for (const f of ['base.js', 'app.js', 'sellar.js', 'nube.js']) correr(leer(f));
+  for (const f of ['base.js', 'app.js', 'sellar.js', 'nube.js', 'ia.js']) correr(leer(f));
   const d = w.document as Document;
   const q = (s: string) => d.querySelector(s) as HTMLElement;
   const todos = (s: string) => [...d.querySelectorAll(s)] as HTMLElement[];

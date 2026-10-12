@@ -13,13 +13,26 @@ Hermana de Cardón DeFi. Hace una sola cosa: mercados de predicción, es decir, 
 ## Qué hace hoy
 
 - **Explorador de Hyperliquid, solo lectura.** Mercados abiertos con pregunta, vencimiento, precio de cada lado y creador; filtros por categoría, creador y precio con su cuenta; buscador y libro de órdenes. Deportes y premios quedan fuera.
+- **Semáforo de precios.** Cada lado y cada activo dicen cuánto cambiaron frente a ayer: verde si subió, rojo si bajó. También el volumen del día.
+- **Mercados globales.** Pestaña «Global» con cripto, bolsa, materias primas, divisas y el índice de miedo y codicia, cada uno con su cambio del día, y un semáforo general (verde, amarillo, rojo) sacado con reglas fijas, sin IA.
+- **Analizar con IA.** Un botón en cada mercado: una o varias IA estiman la probabilidad y dicen «comprar tal lado» o «no entrar», con semáforo. Funciona sin configurar nada con Kilo (gratis, sin clave). Con tu nube puedes sumar Groq, Gemini, OpenRouter, Cerebras y Mistral, y elegir consenso de 2 a 5 IA. Solo opina: no crea órdenes.
+- **Semáforo de estado.** En Config, cuatro luces (mercados, nube, IA, avisos) que dicen qué falla y cómo arreglarlo.
 - **Guardadas.** Estrella para vigilar mercados; los que cierran se marcan «Ya no está abierto».
 - **Avisos.** Notificaciones de Android cuando vence un mercado guardado y, con la nube conectada, las que mande tu agente.
 - **Tu nube.** La app instala tu propio agente en tu Cloudflare (ver abajo). Empieza en simulación.
 - **Sesión por huella.** El teléfono firma un reto con una llave que solo funciona tras huella, rostro o PIN.
 - Cuatro temas de color, español e inglés.
 
-Todavía no: comprar y vender, posiciones y órdenes, IA con consenso y dinero real.
+Todavía no: comprar y vender, posiciones y órdenes, «Pedir a la IA», el supervisor automático y dinero real.
+
+### Cómo decide el análisis
+
+- A la IA solo le llegan datos públicos del mercado: pregunta, regla, precios, libro, historia del activo y el semáforo global. Nada tuyo.
+- La ventaja se mide contra lo que cuesta comprar de verdad (la oferta más barata del libro), no contra el precio medio: en un mercado casi vacío el precio medio puede decir 0,50 cuando la única oferta está en 0,99.
+- Frenos que no dependen de la IA: si nadie vende ese lado, o si la ventaja no llega a 5 puntos (8 con comisión doble), el resultado es «no entrar».
+- Verde = comprar con confianza de 60 o más y al menos dos IA respondiendo; amarillo = comprar con dudas; rojo = no entrar.
+- Las claves de los proveedores se guardan cifradas en tu nube y solo se ven recortadas (`gsk_…6tQF`). Un modelo que agota su límite descansa y no se le vuelve a llamar hasta que pase.
+- Es una opinión automática. No es consejo financiero.
 
 ## Instalar tu nube (desde la app)
 

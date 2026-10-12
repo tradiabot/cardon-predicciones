@@ -358,6 +358,7 @@
       (conectada ? '<button id="nube-salir" class="wide">' + esc(t("nube_salir")) + "</button>" : "") +
       '<p id="nube-nota" class="setup-note">' + esc(N.nota) + "</p>";
     pintarAvisos();
+    window.dispatchEvent(new Event("cardon-nube-estado"));
   }
   function pintarAvisos() {
     var e = nativo("avisosEstado"),
@@ -393,7 +394,7 @@
     var f = pendientes[id];
     if (f) {
       delete pendientes[id];
-      f({ status: status, data: parse(texto) });
+      f({ status: status, data: parse(texto), texto: texto });
     }
   };
   function http(metodo, url, cabeceras, cuerpo) {
@@ -416,6 +417,21 @@
       });
   }
   var W = {}; // lo que se va reuniendo en el asistente; los tokens se borran al terminar
+  // Igual, pero devuelve el texto tal cual. La usa la IA sin clave (Kilo) desde el teléfono:
+  // el navegador de la app no puede llamarla directo, la app Android sí.
+  function httpTexto(url, cabeceras, cuerpo) {
+    if (NATIVO && NATIVO.http)
+      return new Promise(function (ok) {
+        var id = "h" + ++serie;
+        pendientes[id] = ok;
+        NATIVO.http(id, "POST", url, JSON.stringify(cabeceras), cuerpo);
+      });
+    return window.fetch(url, { method: "POST", headers: cabeceras, body: cuerpo }).then(function (r) {
+      return r.text().then(function (x) {
+        return { status: r.status, texto: x };
+      });
+    });
+  }
   function gh(metodo, ruta, cuerpo) {
     return http(metodo, "https://api.github.com" + ruta, { Authorization: "Bearer " + W.gh.token, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "Content-Type": "application/json", "User-Agent": "cardon-predicciones-app" }, cuerpo);
   }
@@ -792,6 +808,18 @@
     if (e.detail === "config") pintarAvisos();
   });
 
+  // Lo que las demás pantallas (IA, semáforo) necesitan de la nube. La sesión no sale de aquí.
+  window.NUBE = {
+    agente: agente,
+    httpTexto: httpTexto,
+    comprobar: comprobar,
+    estado: function () {
+      return { api: N.api, conectada: !!N.api && N.valida === true, valida: N.valida, nota: N.nota };
+    },
+    avisos: function () {
+      return nativo("avisosEstado");
+    },
+  };
   pintar();
   pasarVigiladas();
   if (NATIVO && NATIVO.guardarNube) NATIVO.guardarNube(N.api, N.token);

@@ -13,6 +13,8 @@ export interface Lado {
   nombre: string;
   /** Precio medio de 0 a 1 (la probabilidad que le da el mercado). null = sin precio. */
   precio: number | null;
+  /** Cuánto cambió el precio frente a ayer, en puntos de precio (0,05 = +5 puntos). */
+  cambio?: number | null;
 }
 
 export interface Mercado {
@@ -40,6 +42,20 @@ export interface Mercado {
   precio_actual: number | null;
   objetivo: number | null;
   distancia_pct: number | null;
+  /** Nombre del activo dentro de su plataforma (para pedir su historia). */
+  subyacente_id?: string | null;
+  /** Cuánto cambió el activo frente a ayer, en %. */
+  cambio_subyacente_pct?: number | null;
+  /** Cuánto se movió en el último día, en `moneda`. */
+  volumen?: number | null;
+}
+
+/** Cómo se ha movido el activo del que depende un mercado. */
+export interface Historia {
+  cambio_24h_pct: number | null;
+  rango_24h: [number, number] | null;
+  cambio_7d_pct: number | null;
+  rango_7d: [number, number] | null;
 }
 
 export interface ListaMercados {
@@ -115,6 +131,8 @@ export interface Plataforma {
   vender(pedido: PedidoOrden, cred: Credenciales): Promise<ResultadoOrden>;
   /** Cobra lo ganado en mercados ya resueltos. Devuelve cuánto se cobró (0 si la plataforma paga sola). */
   cobrar(cred: Credenciales): Promise<number>;
+  /** Opcional: historia del activo del que depende un mercado. La usa la IA. */
+  historia?(mercado: Mercado): Promise<Historia | null>;
 }
 
 /** Lo que una plataforma recibe del entorno: así se prueba con una red simulada. */

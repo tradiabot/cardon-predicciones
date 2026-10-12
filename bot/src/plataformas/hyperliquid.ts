@@ -3,7 +3,7 @@
 // Cada mercado tiene un número y dos lados; el lado se llama «#N» con N = 10 × mercado + lado
 // (0 = el primero, normalmente «Sí»). Cada unidad vale entre 0 y 1 USDC y al vencer paga 1 si
 // aciertas y 0 si no. Los datos de lectura son públicos: no hacen falta claves.
-import { type Categoria, type Entorno, ErrorPlataforma, type Idioma, type Lado, type Libro, type ListaMercados, type Mercado, type Nivel, type Plataforma } from './tipos';
+import { type Categoria, type Entorno, ErrorPlataforma, type Historia, type Idioma, type Lado, type Libro, type ListaMercados, type Mercado, type Nivel, type Plataforma } from './tipos';
 
 const ID = 'hyperliquid';
 const URL_INFO = 'https://api.hyperliquid.xyz/info';
@@ -169,8 +169,35 @@ function leerMercado(o: Json, q: Json | undefined, T: ReturnType<typeof textos>)
   return { tipo: 'evento', categoria: 'otro', pregunta: desc ? `${n2} · ${desc.slice(0, 80)}` : n2, vence: venceMs(cq.resolutionDeadline) };
 }
 
+export type Ayer = Record<string, { ayer: number | null; volumen: number | null }>;
+
+/**
+ * Precio de ayer y volumen del día de cada lado («#N») y de cada activo, sacados de las tres
+ * listas de Hyperliquid (mercados de predicción, cripto y bolsa). Un 0 significa «sin dato».
+ */
+export function leerAyer(lados: unknown, ...activos: unknown[]): Ayer {
+  const out: Ayer = {};
+  const positivo = (x: unknown) => {
+    const n = numero(x);
+    return n != null && n > 0 ? n : null;
+  };
+  for (const c of (Array.isArray(lados) ? lados[1] : null) || []) {
+    if (typeof c?.coin === 'string' && c.coin.startsWith('#')) out[c.coin] = { ayer: positivo(c.prevDayPx), volumen: numero(c.dayNtlVlm) };
+  }
+  for (const par of activos) {
+    if (!Array.isArray(par)) continue;
+    const universo: Json[] = par[0]?.universe || [];
+    universo.forEach((u, i) => {
+      if (u?.name && par[1]?.[i]) out[u.name] = { ayer: positivo(par[1][i].prevDayPx), volumen: numero(par[1][i].dayNtlVlm) };
+    });
+  }
+  return out;
+}
+
+const redondo = (n: number, d: number) => Math.round(n * 10 ** d) / 10 ** d;
+
 /** Convierte la respuesta de Hyperliquid en mercados con la forma común. */
-export function leerMercados(meta: Json, precios: Json, ahora: number, idioma: Idioma = 'es'): Mercado[] {
+export function leerMercados(meta: Json, precios: Json, ahora: number, idioma: Idioma = 'es', ayer: Ayer = {}): Mercado[] {
   const T = textos(idioma);
   const preguntas: Record<string, Json> = {};
   for (const q of meta?.questions || []) for (const n of [...(q?.namedOutcomes || []), q?.fallbackOutcome]) preguntas[n] = q;
@@ -183,8 +210,11 @@ export function leerMercados(meta: Json, precios: Json, ahora: number, idioma: I
     if (m.externo && precios['xyz:' + m.externo] != null) m.sub = 'xyz:' + m.externo;
     const lados: Lado[] = (o.sideSpecs || []).map((sd: Json, i: number) => {
       const id = `#${o.outcome * 10 + i}`;
-      return { id, nombre: T.lado(sd.name), precio: numero(precios[id]) };
+      const precio = numero(precios[id]);
+      const antes = ayer[id]?.ayer;
+      return { id, nombre: T.lado(sd.name), precio, cambio: precio != null && antes ? redondo(precio - antes, 4) : null };
     });
+    const volumenes = lados.map((l) => ayer[l.id]?.volumen).filter((v): v is number => v != null);
     if (!lados.some((l) => l.precio != null)) continue;
     // 0,5 / 0,5 exactos = libro vacío: ese precio no es real.
     const sinOfertas = lados.length === 2 && lados.every((l) => l.precio === 0.5);
@@ -199,6 +229,7 @@ export function leerMercados(meta: Json, precios: Json, ahora: number, idioma: I
     const horas = m.vence ? Math.round((m.vence - ahora) / 360_000) / 10 : null;
     const actual = m.sub ? numero(precios[m.sub]) : null;
     const objetivo = m.tipo === 'rango' ? null : (m.objetivo ?? null);
+    const subAyer = m.sub ? ayer[m.sub]?.ayer : null;
     lista.push({
       plataforma: ID,
       id: String(o.outcome),
@@ -217,6 +248,9 @@ export function leerMercados(meta: Json, precios: Json, ahora: number, idioma: I
       precio_actual: actual,
       objetivo,
       distancia_pct: actual != null && objetivo ? Math.round((actual / objetivo - 1) * 10000) / 100 : null,
+      subyacente_id: m.sub || null,
+      cambio_subyacente_pct: actual != null && subAyer ? redondo((actual / subAyer - 1) * 100, 2) : null,
+      volumen: volumenes.length ? redondo(volumenes.reduce((a, b) => a + b, 0), 2) : null,
     });
   }
   const orden: Record<Categoria, number> = { cripto: 0, bolsa: 1, economia: 2, otro: 3 };
@@ -250,9 +284,18 @@ export function crearHyperliquid(entorno: Entorno): Plataforma {
     ],
     async listarMercados(idioma: Idioma = 'es'): Promise<ListaMercados> {
       // Los precios de bolsa y materias primas viven en otro libro («xyz»): si falla, se sigue sin ellos.
-      const [meta, mids, midsXyz] = await Promise.all([info({ type: 'outcomeMeta' }), info({ type: 'allMids' }), info({ type: 'allMids', dex: 'xyz' }).catch(() => ({}))]);
+      // El cambio frente a ayer es un extra: si esas listas fallan, los mercados se ven igual, sin colores.
+      const extra = (cuerpo: Json) => info(cuerpo).catch(() => null);
+      const [meta, mids, midsXyz, lados, cripto, bolsa] = await Promise.all([
+        info({ type: 'outcomeMeta' }),
+        info({ type: 'allMids' }),
+        info({ type: 'allMids', dex: 'xyz' }).catch(() => ({})),
+        extra({ type: 'spotMetaAndAssetCtxs' }),
+        extra({ type: 'metaAndAssetCtxs' }),
+        extra({ type: 'metaAndAssetCtxs', dex: 'xyz' }),
+      ]);
       const ts = ahora();
-      return { plataforma: ID, ts, mercados: leerMercados(meta, { ...mids, ...midsXyz }, ts, idioma) };
+      return { plataforma: ID, ts, mercados: leerMercados(meta, { ...mids, ...midsXyz }, ts, idioma, leerAyer(lados, cripto, bolsa)) };
     },
     async libro(lado: string): Promise<Libro> {
       if (!/^#\d{2,9}$/.test(lado)) throw new ErrorPlataforma(ID, 'Mercado inválido');
@@ -260,6 +303,22 @@ export function crearHyperliquid(entorno: Entorno): Plataforma {
       const [compras, ventas] = d?.levels || [[], []];
       const nivel = (x: Json): Nivel => ({ precio: Number(x.px), unidades: Number(x.sz) });
       return { plataforma: ID, lado, ts: ahora(), compras: (compras || []).slice(0, 5).map(nivel), ventas: (ventas || []).slice(0, 5).map(nivel) };
+    },
+    async historia(m: Mercado): Promise<Historia | null> {
+      if (!m.subyacente_id) return null;
+      const fin = ahora();
+      const velas: Json[] = await info({ type: 'candleSnapshot', req: { coin: m.subyacente_id, interval: '1h', startTime: fin - 7 * 24 * 3_600_000, endTime: fin } });
+      const cierres = (Array.isArray(velas) ? velas : []).map((v) => Number(v?.c)).filter((x) => x > 0);
+      if (cierres.length < 3) return null;
+      const ultimo = cierres[cierres.length - 1];
+      const dia = cierres.slice(-25);
+      const cambio = (desde: number) => redondo((ultimo / desde - 1) * 100, 2);
+      return {
+        cambio_24h_pct: cambio(dia[0]),
+        rango_24h: [Math.min(...dia), Math.max(...dia)],
+        cambio_7d_pct: cierres.length > 30 ? cambio(cierres[0]) : null,
+        rango_7d: cierres.length > 30 ? [Math.min(...cierres), Math.max(...cierres)] : null,
+      };
     },
     saldo: etapa2,
     posiciones: etapa2,

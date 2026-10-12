@@ -29,17 +29,17 @@ describe('Agente en la nube con Hyperliquid simulado', () => {
     expect((await pedir('/api/v1/mercados?idioma=en')).datos.mercados[0].pregunta).toBe('SOL ≥ 109.32 at expiry?');
   });
 
-  it('gasta pocas subpeticiones: 3 por lectura y una sola lectura por minuto', async () => {
+  it('gasta pocas subpeticiones: 6 por lectura y una sola lectura por minuto', async () => {
     const { pedir, sim, avanzar } = preparar();
     await pedir('/api/v1/mercados');
-    expect(sim.llamadas).toHaveLength(3); // el plan gratis de Cloudflare permite 50 por ejecución
+    expect(sim.llamadas).toHaveLength(6); // el plan gratis de Cloudflare permite 50 por ejecución
     await pedir('/api/v1/mercados');
     avanzar(59_000);
     await pedir('/api/v1/mercados');
-    expect(sim.llamadas).toHaveLength(3);
+    expect(sim.llamadas).toHaveLength(6);
     avanzar(2_000);
     await pedir('/api/v1/mercados');
-    expect(sim.llamadas).toHaveLength(6);
+    expect(sim.llamadas).toHaveLength(12);
   });
 
   it('sirve el libro de un lado', async () => {

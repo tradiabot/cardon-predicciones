@@ -16,8 +16,8 @@ describe('Hyperliquid: leer mercados', () => {
     expect(sol).toMatchObject({ plataforma: 'hyperliquid', pregunta: '¿SOL ≥ 109,32 al vencer?', categoria: 'cripto', plazo: 'hoy', creador: 'Hyperliquid', moneda: 'USDC', comision_doble: false, horas: 6 });
     expect(sol.vence).toBe(Date.UTC(2026, 9, 12, 6, 0));
     expect(sol.lados).toEqual([
-      { id: '#109990', nombre: 'Sí', precio: 0.978335 },
-      { id: '#109991', nombre: 'No', precio: 0.021665 },
+      { id: '#109990', nombre: 'Sí', precio: 0.978335, cambio: 0.05 },
+      { id: '#109991', nombre: 'No', precio: 0.021665, cambio: -0.05 },
     ]);
     expect(sol).toMatchObject({ subyacente: 'SOL', precio_actual: 111.685, objetivo: 109.32, distancia_pct: 2.16 });
   });
@@ -85,6 +85,38 @@ describe('Hyperliquid: leer mercados', () => {
   });
 });
 
+describe('Hyperliquid: cambio frente a ayer', () => {
+  it('cada lado dice cuánto cambió hoy, y el mercado su volumen y el cambio de su activo', async () => {
+    const sol = (await mercados()).find((m) => m.id === '10999')!;
+    expect(sol.lados.map((l) => l.cambio)).toEqual([0.05, -0.05]);
+    expect(sol).toMatchObject({ subyacente_id: 'SOL', cambio_subyacente_pct: -0.46, volumen: 241 });
+    const petroleo = (await mercados()).find((m) => m.id === '11255')!;
+    expect(petroleo).toMatchObject({ subyacente_id: 'xyz:CL', cambio_subyacente_pct: -1.51 });
+  });
+
+  it('sin precio de ayer no inventa un cambio', async () => {
+    const hype = (await mercados()).find((m) => m.id === '7186')!;
+    expect(hype.cambio_subyacente_pct).toBeNull(); // ayer = 0 en la lista: sin dato
+  });
+
+  it('si esas listas fallan, los mercados se leen igual, solo sin colores', async () => {
+    const hl = crearHyperliquid({ fetch: hyperliquidSimulado({ sinAyer: true }).red, ahora: () => AHORA });
+    const lista = (await hl.listarMercados()).mercados;
+    expect(lista).toHaveLength(14);
+    expect(lista[0].lados[0]).toMatchObject({ precio: 0.978335, cambio: null });
+    expect(lista[0]).toMatchObject({ cambio_subyacente_pct: null, volumen: null });
+  });
+
+  it('da la historia del activo de un mercado: 24 horas y 7 días', async () => {
+    const { hl, sim } = crear();
+    const sol = (await hl.listarMercados()).mercados.find((m) => m.id === '10999')!;
+    expect(await hl.historia!(sol)).toEqual({ cambio_24h_pct: 2.1, rango_24h: [114.3, 116.7], cambio_7d_pct: 16.7, rango_7d: [100, 116.7] });
+    expect(sim.llamadas.at(-1)).toMatchObject({ type: 'candleSnapshot', req: { coin: 'SOL', interval: '1h', endTime: AHORA } });
+    const fed = (await hl.listarMercados()).mercados.find((m) => m.id === '4887')!;
+    expect(await hl.historia!(fed)).toBeNull();
+  });
+});
+
 describe('Hyperliquid: libro y errores', () => {
   it('da el libro de un lado: quién compra y quién vende', async () => {
     const { hl, sim } = crear();
@@ -108,7 +140,7 @@ describe('Hyperliquid: libro y errores', () => {
   it('solo lee: nunca llama a la dirección de órdenes y operar aún no existe', async () => {
     const { hl, sim } = crear();
     await hl.listarMercados();
-    expect(sim.llamadas.map((c) => c.type)).toEqual(['outcomeMeta', 'allMids', 'allMids']);
+    expect(sim.llamadas.map((c) => c.type)).toEqual(['outcomeMeta', 'allMids', 'allMids', 'spotMetaAndAssetCtxs', 'metaAndAssetCtxs', 'metaAndAssetCtxs']);
     expect(() => hl.comprar({ lado: '#109990', unidades: 1, limite: 0.5 }, {})).toThrow('solo lee mercados');
     expect(() => hl.vender({ lado: '#109990', unidades: 1, limite: 0.5 }, {})).toThrow('solo lee mercados');
   });

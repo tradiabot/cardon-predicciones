@@ -14,9 +14,18 @@
 <p id="pm-estado" class="muted pm-estado"></p>
 <div id="pm-lista"></div>
 </section>
+<section id="global" class="screen">
+<div class="section-head"><div><span class="eyebrow" data-t="global_eyebrow"></span><h2 data-t="global_titulo"></h2></div><button id="g-actualizar" class="icon-btn" data-t-title="actualizar">↻</button></div>
+<div id="g-semaforo" class="panel"></div>
+<div id="g-errores"></div>
+<div id="g-lista"></div>
+<p id="g-estado" class="muted pm-estado"></p>
+</section>
 <section id="config" class="screen">
 <div class="section-head"><div><span class="eyebrow" data-t="config_eyebrow"></span><h2 data-t="config_titulo"></h2></div></div>
+<div class="panel" id="semaforo"></div>
 <div class="panel" id="nube"></div>
+<div class="panel" id="ia"></div>
 <div class="panel" id="avisos-panel"></div>
 <div class="panel"><div class="panel-title" data-t="colores"></div><div id="temas" class="theme-grid"></div></div>
 <div class="panel"><div class="panel-title" data-t="idioma"></div><div class="grid two pm-idioma"><button data-idioma="es">Español</button><button data-idioma="en">English</button></div></div>
@@ -26,7 +35,7 @@
 <div class="panel"><div class="panel-title" data-t="acerca"></div><p id="acerca" class="muted"></p></div>
 </section>
 </main>
-<nav class="nav"><button class="active" data-target="mercados">◎<small data-t="nav_mercados"></small></button><button data-target="config">⚙<small data-t="nav_config"></small></button></nav>
+<nav class="nav"><button class="active" data-target="mercados">◎<small data-t="nav_mercados"></small></button><button data-target="global">◐<small data-t="nav_global"></small></button><button data-target="config">⚙<small data-t="nav_config"></small></button></nav>
 <div id="toast" class="toast"></div>
-<script src="config.js"></script><script src="i18n.js"></script><script src="nucleo.js"></script><script src="base.js"></script><script src="app.js"></script><script src="sellar.js"></script><script src="nube.js"></script>
+<script src="config.js"></script><script src="i18n.js"></script><script src="nucleo.js"></script><script src="base.js"></script><script src="app.js"></script><script src="sellar.js"></script><script src="nube.js"></script><script src="ia.js"></script>
 </body></html>

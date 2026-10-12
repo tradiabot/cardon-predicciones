@@ -1601,3 +1601,175 @@ button:disabled {
 #avisos-panel button {
   margin-top: 8px;
 }
+
+/* ---------- Semáforo, cambios de precio, mercados globales e IA ---------- */
+/* Verde, ámbar y rojo de verdad, iguales en los cuatro temas: aquí el color es el mensaje. */
+:root {
+  --verde: #35d07f;
+  --ambar: #f0b93a;
+  --rojo: #ff5c6c;
+}
+html[data-theme="arena"] {
+  --verde: #15803d;
+  --ambar: #b45309;
+  --rojo: #dc2626;
+}
+.luz {
+  flex: none;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ambar);
+  box-shadow: 0 0 8px var(--ambar);
+  vertical-align: middle;
+}
+.luz.verde {
+  background: var(--verde);
+  box-shadow: 0 0 8px var(--verde);
+}
+.luz.rojo {
+  background: var(--rojo);
+  box-shadow: 0 0 8px var(--rojo);
+}
+.sube,
+.baja,
+.igual {
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sube {
+  color: var(--verde);
+}
+.baja {
+  color: var(--rojo);
+}
+.igual {
+  color: var(--muted);
+}
+.pm-cambio {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  margin: -4px 0 8px;
+}
+.sem-cab {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.sem-cab b {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.sem-razones {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.sem-pie {
+  font-size: 11px;
+  margin-bottom: 0;
+}
+.sem-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+.sem-fila .luz {
+  margin-top: 4px;
+}
+.sem-fila b {
+  display: block;
+  font-size: 13px;
+}
+.sem-fila small {
+  display: block;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.g-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.g-celda {
+  background: var(--inset);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px;
+  min-width: 0;
+}
+.g-celda span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.g-celda b {
+  display: block;
+  font-size: 17px;
+  margin: 4px 0 2px;
+  overflow-wrap: anywhere;
+}
+.g-celda em {
+  font-style: normal;
+  font-size: 12px;
+}
+.ia-boton {
+  margin-top: 9px;
+}
+.ia-res {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--ambar);
+  border-radius: 6px;
+  background: var(--inset);
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.ia-res[data-color="verde"] {
+  border-left-color: var(--verde);
+}
+.ia-res[data-color="rojo"] {
+  border-left-color: var(--rojo);
+}
+.ia-res p {
+  margin: 7px 0 0;
+}
+.ia-votos {
+  margin: 4px 0;
+  padding-left: 18px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.ia-modelo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.ia-modelo span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.ia-modelo button {
+  flex: none;
+  padding: 6px 10px;
+}
+#ia button,
+#semaforo button {
+  margin-top: 8px;
+}
+#ia input {
+  margin-top: 6px;
+}

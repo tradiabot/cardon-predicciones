@@ -54,6 +54,15 @@
     return new Date(ms).toLocaleString(I18N.idioma(), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   }
 
+  // Verde si subió frente a ayer, rojo si bajó. `texto` ya viene con su signo.
+  function cambio(n, texto) {
+    if (n == null) return "";
+    return ' <i class="' + (n > 0 ? "sube" : n < 0 ? "baja" : "igual") + '">' + (n > 0 ? "▲ " : n < 0 ? "▼ " : "") + esc(texto) + "</i>";
+  }
+  function conSigno(n, decimales) {
+    return (n > 0 ? "+" : "") + num(n, decimales);
+  }
+
   /* ---------- Filtros: cada opción muestra cuántos mercados tiene ---------- */
   function chip(attr, valor, texto, n, activo) {
     return '<button data-' + attr + '="' + esc(valor) + '"' + (activo ? ' class="active"' : "") + ">" + esc(texto) + (n ? " · " + n : "") + "</button>";
@@ -125,13 +134,19 @@
       g = !!E.guardadas[k],
       f = E.filtro;
     var cuando = m.vence ? (falta(m.vence) ? t("vence_en", { t: falta(m.vence) }) + " · " + fecha(m.vence) : t("vencido")) : t("sin_fecha");
-    var linea = [cuando];
-    if (m.precio_actual != null && m.subyacente) linea.push(t("ahora_vale", { sub: m.subyacente, precio: precio(m.precio_actual) }) + (m.distancia_pct != null ? " (" + (m.distancia_pct > 0 ? "+" : "") + num(m.distancia_pct, 2) + "%)" : ""));
-    linea.push(t("creado_por", { creador: m.creador }));
-    if (plataformas.length > 1) linea.push(nombrePlataforma(m.plataforma));
+    var linea = [esc(cuando)];
+    if (m.precio_actual != null && m.subyacente)
+      linea.push(
+        esc(t("ahora_vale", { sub: m.subyacente, precio: precio(m.precio_actual) })) +
+          (m.cambio_subyacente_pct != null ? cambio(m.cambio_subyacente_pct, t("hoy_pct", { n: conSigno(m.cambio_subyacente_pct, 2) })) : "") +
+          (m.distancia_pct != null ? esc(" · " + t("del_objetivo", { n: conSigno(m.distancia_pct, 2) })) : ""),
+      );
+    linea.push(esc(t("creado_por", { creador: m.creador })));
+    if (m.volumen) linea.push(esc(t("volumen", { n: num(m.volumen, 0), moneda: m.moneda })));
+    if (plataformas.length > 1) linea.push(esc(nombrePlataforma(m.plataforma)));
     return (
       '<div class="panel pm-mercado" data-mercado="' + esc(k) + '"><div class="pm-cab"><b>' + esc(m.pregunta) + '</b><button class="pm-estrella" data-estrella="' + esc(k) + '" aria-pressed="' + g + '" title="' + esc(t(g ? "quitar" : "guardar")) + '">' + (g ? "★" : "☆") + "</button></div>" +
-      "<small>" + esc(linea.join(" · ")) + "</small>" +
+      "<small>" + linea.join(" · ") + "</small>" +
       (m.comision_doble ? '<small class="pm-aviso">⚠ ' + esc(t("comision_doble", { creador: m.creador })) + "</small>" : "") +
       (m.sin_ofertas ? '<small class="pm-aviso">⚠ ' + esc(t("sin_ofertas")) + "</small>" : "") +
       (m.regla ? "<small>" + esc(m.regla) + "</small>" : "") +
@@ -142,6 +157,7 @@
           var abierto = !!E.libros[m.plataforma + " " + l.id];
           return (
             '<div class="pm-lado"><span>' + esc(l.nombre) + (l.precio != null ? " · " + Math.round(l.precio * 100) + "%" : "") + "</span><b>" + (l.precio != null ? num(l.precio, 3) : "—") + "</b>" +
+            (l.cambio != null ? '<em class="pm-cambio">' + cambio(l.cambio, t("hoy_puntos", { n: conSigno(l.cambio * 100, 1) })) + "</em>" : "") +
             '<button data-libro="' + esc(k) + '" data-lado="' + esc(l.id) + '">' + esc(t(abierto ? "ocultar_libro" : "ver_libro")) + "</button></div>"
           );
         })
@@ -152,6 +168,7 @@
           return htmlLibro(m, l);
         })
         .join("") +
+      (window.IA ? window.IA.tarjeta(m, k) : "") +
       "</div>"
     );
   }
@@ -288,6 +305,22 @@
     if (!document.hidden && B.aceptado() && $("mercados").classList.contains("active")) cargar();
   }, CADA_MS);
 
+  window.APP = {
+    E: E,
+    plataformas: plataformas,
+    pintar: pintar,
+    cargar: cargar,
+    num: num,
+    precio: precio,
+    hace: hace,
+    conSigno: conSigno,
+    cambio: cambio,
+    mercado: function (k) {
+      return (E.datos ? E.datos.mercados : []).filter(function (x) {
+        return N.clave(x) === k;
+      })[0];
+    },
+  };
   pintarPlataformas();
   pintar();
   // Nada sale a la red hasta aceptar el aviso legal.
