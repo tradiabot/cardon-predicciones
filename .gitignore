@@ -11,3 +11,5 @@ app/android/app/src/personal/
 *.apk
 *.jks
 *.keystore
+# El APK que se descarga desde el sitio sí se publica.
+!docs/Cardon-Predicciones.apk
