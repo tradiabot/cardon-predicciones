@@ -337,8 +337,8 @@ describe('Interfaz: semáforo', () => {
 
   it('con nube: conectada, IA según tu agente y avisos según el permiso', async () => {
     const a = await conNube('{"ok":true}');
-    await a.esperar(() => luces(a).nube[1].includes('0.3.0'), 'la versión de la nube');
-    expect(luces(a).nube).toEqual(['verde', 'Conectada (versión 0.3.0).']);
+    await a.esperar(() => luces(a).nube[1].includes('1.0.0'), 'la versión de la nube');
+    expect(luces(a).nube).toEqual(['verde', 'Conectada (versión 1.0.0).']);
     expect(luces(a).avisos).toEqual(['verde', 'Activados.']);
     a.tocar(a.q('#sem-revisar'));
     await a.esperar(() => luces(a).ia[0] === 'verde', 'la IA en verde');
@@ -352,7 +352,7 @@ describe('Interfaz: semáforo', () => {
   it('avisa si tu nube es de una versión anterior a la app', async () => {
     const a = await conNube('{"ok":true}', '0.2.0');
     await a.esperar(() => luces(a).nube[0] === 'amarillo' && luces(a).nube[1].includes('0.2.0'), 'el aviso de versión');
-    expect(luces(a).nube[1]).toBe('Conectada, pero tu nube es la versión 0.2.0 y la app la 0.3.0. Toca «Reinstalar o actualizar» en Mi nube.');
+    expect(luces(a).nube[1]).toBe('Conectada, pero tu nube es la versión 0.2.0 y la app la 1.0.0. Toca «Reinstalar o actualizar» en Mi nube.');
   });
 
   it('sin sesión pide entrar con huella', async () => {

@@ -10,4 +10,4 @@ cd ../app/android
 
 En un teléfono con Termux hace falta además `-Pandroid.aapt2FromMavenOverride=/usr/lib/android-sdk/build-tools/debian/aapt2`.
 
-La edición `personal` es para una compilación propia que ya apunte a tu nube: crea `app/src/personal/assets/web/config.js` (no se versiona) con `window.CARDON = { publica: false, api: 'https://TU-AGENTE.workers.dev/api/v1', plantilla: 'tradiabot/cardon-predicciones', version: '0.3.0' };` y compila con `assemblePersonalRelease`. Entrar sigue pidiendo tu huella.
+La edición `personal` es para una compilación propia que ya apunte a tu nube: crea `app/src/personal/assets/web/config.js` (no se versiona) con `window.CARDON = { publica: false, api: 'https://TU-AGENTE.workers.dev/api/v1', plantilla: 'tradiabot/cardon-predicciones', version: '1.0.0' };` y compila con `assemblePersonalRelease`. Entrar sigue pidiendo tu huella.

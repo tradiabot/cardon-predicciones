@@ -1,6 +1,6 @@
 {
   "name": "cardon-predicciones",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "private": true,
   "license": "MIT",
   "description": "Cardón Predicciones: agente de mercados de predicción en Cloudflare Workers.",

@@ -1,11 +1,11 @@
 <p align="center"><img src="brand/logo-lockup.svg" alt="Cardón Predicciones" width="460"></p>
 
-**Agente de Mercados de Predicción · Prediction Markets Agent** — piloto temprano
+**Agente de Mercados de Predicción · Prediction Markets Agent** — versión 1.0
 
 Hermana de Cardón DeFi. Hace una sola cosa: mercados de predicción, es decir, preguntas de sí o no en las que cada unidad paga 1 USDC si aciertas y 0 si fallas. No compra ni vende monedas.
 
 - Sitio: https://tradiabot.github.io/cardon-predicciones/
-- Descarga para Android (piloto): https://github.com/tradiabot/cardon-predicciones/releases/download/v0.2.0/Cardon-Predicciones-0.2.0.apk
+- Descarga para Android: https://github.com/tradiabot/cardon-predicciones/releases/download/v1.0.0/Cardon-Predicciones-1.0.0.apk
 - [Aviso legal y descargo de responsabilidad](AVISO-LEGAL.md)
 
 > **No es consejo financiero.** Puedes perder todo lo que pongas, y cada persona es responsable de que usar estos mercados sea legal en su país.

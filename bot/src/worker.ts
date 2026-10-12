@@ -12,7 +12,7 @@ import { buscarPlataforma, crearPlataformas, type Fabrica } from './plataformas/
 import { ErrorPlataforma, type Idioma } from './plataformas/tipos';
 import { entrar, esDueno, type Llaves, reto, salir } from './sesion';
 
-export const VERSION = '0.3.0';
+export const VERSION = '1.0.0';
 const CACHE_MS = 60_000;
 const CACHE_GLOBAL_MS = 5 * 60_000;
 const CACHE_ANALISIS_MS = 10 * 60_000;
