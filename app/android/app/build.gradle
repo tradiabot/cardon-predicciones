@@ -1,0 +1,38 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.cardonpredicciones.app'
+    compileSdk 34
+    buildToolsVersion '34.0.0'
+    defaultConfig {
+        applicationId 'com.cardonpredicciones.app'
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName '0.1.0'
+        aaptOptions { ignoreAssetsPattern '!.svn:!*.scc:.*:!CVS:!thumbs.db:!*~' }
+    }
+    // «publica»: la app que se comparte; viene vacía, sin nube ni datos de nadie.
+    // «personal»: compilación propia que apunta a tu nube con src/personal/assets/web/config.js (no se versiona).
+    flavorDimensions 'edicion'
+    productFlavors {
+        publica { dimension 'edicion' }
+        personal {
+            dimension 'edicion'
+            applicationIdSuffix '.personal'
+        }
+    }
+    buildTypes {
+        // ./gradlew assemblePublicaRelease -PfirmaLocal la firma con la llave de depuración de este equipo
+        // (sin ser depurable). Sin esa opción queda sin firmar.
+        release { if (project.hasProperty('firmaLocal')) signingConfig signingConfigs.debug }
+    }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

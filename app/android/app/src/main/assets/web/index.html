@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a0f0d"><title>Cardón Predicciones</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="topbar"><div class="brand"><svg class="brand-logo" viewBox="0 0 100 100" width="38" height="38" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M50 82 L50 16" stroke="currentColor" stroke-width="11"/><path d="M50 60 L65.5 60 L65.5 27" stroke="currentColor" stroke-width="7.5"/><path d="M50 68 L34.5 68 L34.5 35" stroke="currentColor" stroke-width="7.5"/><path d="M50 77 L21 77 L21 53" stroke="currentColor" stroke-width="6.5"/><path d="M50 77 L79 77 L79 46" stroke="currentColor" stroke-width="6.5"/><path d="M10 90.5 L90 90.5" class="sand" stroke-width="3.5"/></svg><div><h1>Cardón <b>Predicciones</b></h1><span class="eyebrow" data-t="lema"></span></div></div><span class="pill warn" data-t="solo_lectura"></span></header>
+<main id="app">
+<section id="mercados" class="screen active">
+<div class="section-head"><div><span class="eyebrow" data-t="explorar_eyebrow"></span><h2 data-t="explorar_titulo"></h2></div><button id="pm-actualizar" class="icon-btn" data-t-title="actualizar">↻</button></div>
+<details class="panel pm-ayuda"><summary data-t="como_funciona"></summary><p id="pm-como" class="muted"></p></details>
+<input id="pm-buscar" class="pm-buscar" type="search" autocomplete="off" data-t-ph="buscar">
+<div id="pm-categorias" class="chips pm-filtro"></div>
+<div id="pm-plataformas" class="chips pm-filtro" hidden></div>
+<div id="pm-creadores" class="chips pm-filtro"></div>
+<div id="pm-precios" class="chips pm-filtro"></div>
+<div id="pm-errores"></div>
+<p id="pm-estado" class="muted pm-estado"></p>
+<div id="pm-lista"></div>
+</section>
+<section id="config" class="screen">
+<div class="section-head"><div><span class="eyebrow" data-t="config_eyebrow"></span><h2 data-t="config_titulo"></h2></div></div>
+<div class="panel"><div class="panel-title" data-t="colores"></div><div id="temas" class="theme-grid"></div></div>
+<div class="panel"><div class="panel-title" data-t="idioma"></div><div class="grid two pm-idioma"><button data-idioma="es">Español</button><button data-idioma="en">English</button></div></div>
+<div class="panel"><div class="panel-title" data-t="plataformas"></div><p class="muted" data-t="plataformas_nota"></p><div id="plataformas"></div></div>
+<div class="panel"><div class="panel-title" data-t="legal"></div><p class="muted" data-t="legal_nota"></p><button id="ver-aviso" class="wide" data-t="legal_ver"></button></div>
+<div class="panel" id="donar"></div>
+<div class="panel"><div class="panel-title" data-t="acerca"></div><p id="acerca" class="muted"></p></div>
+</section>
+</main>
+<nav class="nav"><button class="active" data-target="mercados">◎<small data-t="nav_mercados"></small></button><button data-target="config">⚙<small data-t="nav_config"></small></button></nav>
+<div id="toast" class="toast"></div>
+<script src="config.js"></script><script src="i18n.js"></script><script src="nucleo.js"></script><script src="base.js"></script><script src="app.js"></script>
+</body></html>
