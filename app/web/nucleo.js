@@ -79,9 +79,10 @@ var NUCLEO = (() => {
     return Object.keys(guardadas).filter((k) => !abiertos.has(k) && !sinDatos.has(guardadas[k].plataforma)).map((k) => guardadas[k]);
   }
   function alternarGuardada(guardadas, m, ahora) {
+    var _a;
     const out = { ...guardadas }, k = clave(m);
     if (out[k]) delete out[k];
-    else out[k] = { plataforma: m.plataforma, id: m.id, pregunta: m.pregunta, ts: ahora };
+    else out[k] = { plataforma: m.plataforma, id: m.id, pregunta: m.pregunta, ts: ahora, vence: (_a = m.vence) != null ? _a : null };
     return out;
   }
 

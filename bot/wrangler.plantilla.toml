@@ -1,0 +1,18 @@
+# Plantilla de configuración. El instalador (.github/workflows/instalar.yml) la copia a wrangler.toml
+# y sustituye los valores entre guiones bajos. No pongas secretos en este archivo.
+name = "cardon-predicciones"
+main = "src/worker.ts"
+compatibility_date = "2025-09-01"
+account_id = "__ACCOUNT_ID__"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cardon_predicciones"
+database_id = "__D1_ID__"
+migrations_dir = "migrations"
+
+[vars]
+# Mitad pública de la llave de tu teléfono (no es secreta): con ella el agente reconoce tu huella.
+DEVICE_PUBLIC_KEY = "__DEVICE_PUBLIC_KEY__"
+
+# Secretos (nunca en este archivo): ADMIN_TOKEN (contraseña de respaldo, la crea el instalador).

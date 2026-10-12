@@ -1,6 +1,6 @@
 {
   "name": "cardon-predicciones",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "description": "Cardón Predicciones: agente de mercados de predicción en Cloudflare Workers.",
@@ -13,9 +13,12 @@
     "@cloudflare/workers-types": "^5.20260930.2",
     "@types/jsdom": "^30.0.0",
     "@types/node": "^26.6.5",
+    "blakejs": "^1.2.1",
     "esbuild": "^0.25.0",
     "jsdom": "^25.0.0",
+    "tweetnacl": "^1.0.3",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "wrangler": "^4.0.0"
   }
 }

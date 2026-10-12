@@ -16,7 +16,7 @@ function preparar(op?: Parameters<typeof hyperliquidSimulado>[0]) {
 describe('Agente en la nube con Hyperliquid simulado', () => {
   it('responde salud y la lista de plataformas', async () => {
     const { pedir } = preparar();
-    expect((await pedir('/api/v1/salud')).datos).toMatchObject({ ok: true, ts: AHORA });
+    expect((await pedir('/api/v1/salud')).datos).toMatchObject({ ok: true, ts: AHORA, modo: 'simulacion' });
     expect((await pedir('/api/v1/plataformas')).datos).toEqual({ plataformas: [{ id: 'hyperliquid', nombre: 'Hyperliquid', moneda: 'USDC', minimo_orden: 1 }] });
   });
 
@@ -59,8 +59,8 @@ describe('Agente en la nube con Hyperliquid simulado', () => {
 
   it('rechaza lo que no existe y todo lo que no sea leer', async () => {
     const { pedir, sim } = preparar();
-    expect((await pedir('/api/v1/ordenes')).status).toBe(404);
-    expect((await pedir('/api/v1/mercados', { method: 'POST' })).status).toBe(405);
+    expect((await pedir('/api/v1/ordenes')).status).toBe(500); // sin base de datos no hay zona privada
+    expect((await pedir('/api/v1/mercados', { method: 'DELETE' })).status).toBe(405);
     expect((await pedir('/api/v1/libro?plataforma=otra&lado=x'))).toMatchObject({ status: 502, datos: { error: 'Plataforma desconocida: otra' } });
     expect((await pedir('/api/v1/libro?plataforma=hyperliquid&lado=BTC')).datos.error).toBe('Mercado inválido');
     expect(sim.llamadas).toHaveLength(0);

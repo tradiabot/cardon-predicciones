@@ -1,66 +1,8 @@
 // La interfaz de verdad (app/web) corriendo en jsdom con Hyperliquid simulado.
-import { build } from 'esbuild';
-import { JSDOM } from 'jsdom';
 import { readFileSync } from 'node:fs';
-import { Script } from 'node:vm';
-import { beforeAll, describe, expect, it } from 'vitest';
-import { crearFalsa } from './falsa';
+import { describe, expect, it } from 'vitest';
+import { abrir, leer, nucleoFresco } from './pantalla';
 import { AHORA, hyperliquidSimulado } from './simulada';
-
-const WEB = new URL('../../app/web/', import.meta.url);
-const leer = (f: string) => readFileSync(new URL(f, WEB), 'utf8');
-let nucleo = '';
-beforeAll(async () => {
-  const r = await build({ entryPoints: ['src/nucleo.ts'], bundle: true, format: 'iife', globalName: 'NUCLEO', target: 'es2019', write: false, banner: { js: '/* Generado con «npm run app» desde bot/src. No lo edites a mano. */' } });
-  nucleo = r.outputFiles[0].text;
-});
-
-interface Op {
-  aceptado?: boolean;
-  idioma?: string;
-  sim?: ReturnType<typeof hyperliquidSimulado>;
-  conFeria?: boolean;
-  guardadas?: object;
-}
-async function abrir(op: Op = {}) {
-  const sim = op.sim || hyperliquidSimulado();
-  const dom = new JSDOM(leer('index.html').replace(/<script src="[^"]+"><\/script>/g, ''), { url: 'https://app.prueba/', runScripts: 'outside-only', pretendToBeVisual: true });
-  const w = dom.window as any;
-  // Igual que una etiqueta <script>: lo declarado arriba del todo queda global.
-  const correr = (codigo: string) => new Script(codigo).runInContext(dom.getInternalVMContext());
-  w.fetch = sim.red;
-  w.scrollTo = () => {};
-  w.Date.now = () => AHORA;
-  if (op.aceptado !== false) w.localStorage.setItem('cardon-pred-aviso', JSON.stringify({ v: '2026-10-12' }));
-  w.localStorage.setItem('cardon-pred-idioma', op.idioma || 'es');
-  if (op.guardadas) w.localStorage.setItem('cardon-pred-guardadas', JSON.stringify(op.guardadas));
-  for (const f of ['config.js', 'i18n.js']) correr(leer(f));
-  correr(nucleo);
-  if (op.conFeria) {
-    // Lo único que cambia al sumar una plataforma: una entrada más en la lista.
-    const original = w.NUCLEO.crearPlataformas;
-    w.NUCLEO = { ...w.NUCLEO, crearPlataformas: (entorno: any) => [...original(entorno), crearFalsa({ fetch: sim.red, ahora: () => AHORA })] };
-  }
-  for (const f of ['base.js', 'app.js']) correr(leer(f));
-  const d = w.document as Document;
-  const q = (s: string) => d.querySelector(s) as HTMLElement;
-  const todos = (s: string) => [...d.querySelectorAll(s)] as HTMLElement[];
-  const esperar = async (cond: () => unknown, que = 'la condición') => {
-    for (let i = 0; i < 200; i++) {
-      if (cond()) return;
-      await new Promise((r) => setTimeout(r, 5));
-    }
-    throw new Error(`No llegó: ${que}`);
-  };
-  const tocar = (e: Element | null | undefined) => {
-    if (!e) throw new Error('No encontré qué tocar');
-    e.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
-  };
-  const chip = (texto: string) => todos('.pm-filtro button').find((b) => b.textContent!.startsWith(texto));
-  const preguntas = () => todos('#pm-lista .pm-cab b').map((b) => b.textContent);
-  const listo = () => esperar(() => todos('#pm-lista .pm-mercado').length > 0, 'la lista de mercados');
-  return { w, d, q, todos, esperar, tocar, chip, preguntas, listo, sim };
-}
 
 describe('Interfaz: aviso legal', () => {
   it('es obligatorio al abrir y nada sale a la red antes de aceptarlo', async () => {
@@ -294,20 +236,20 @@ describe('Interfaz: configuración', () => {
 });
 
 describe('Lo que se empaqueta en la app', () => {
-  it('nucleo.js está al día con bot/src', () => {
-    expect(leer('nucleo.js')).toBe(nucleo);
+  it('nucleo.js está al día con bot/src', async () => {
+    expect(leer('nucleo.js')).toBe(await nucleoFresco());
   });
 
   it('la app Android lleva exactamente la misma interfaz', () => {
     const android = new URL('../../app/android/app/src/main/assets/web/', import.meta.url);
-    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'style.css', 'config.js']) expect(readFileSync(new URL(f, android), 'utf8'), f).toBe(leer(f));
+    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'sellar.js', 'style.css', 'config.js']) expect(readFileSync(new URL(f, android), 'utf8'), f).toBe(leer(f));
   });
 
   it('la edición pública no lleva datos de nadie', () => {
     expect(leer('config.js')).toContain("api: ''");
-    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'config.js']) {
+    for (const f of ['index.html', 'app.js', 'base.js', 'i18n.js', 'nucleo.js', 'nube.js', 'config.js']) {
       expect(leer(f), f).not.toMatch(/0x1c22/i);
-      expect(leer(f), f).not.toMatch(/workers\.dev/);
+      expect(leer(f), f).not.toMatch(/[a-z0-9-]+\.[a-z0-9-]+\.workers\.dev/); // ninguna nube concreta
     }
   });
 });

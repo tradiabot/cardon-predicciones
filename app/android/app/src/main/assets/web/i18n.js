@@ -70,7 +70,7 @@
       plataformas_nota: "Dónde opera la app. Las claves se guardan aparte para cada plataforma.",
       plat_lectura: "LECTURA",
       plat_detalle: "Se paga y se cobra en {moneda} · mínimo por orden aproximado: {min} {moneda}",
-      plat_claves: "Esta versión solo lee mercados y no pide ninguna clave. Para operar hará falta: {claves}.",
+      plat_claves: "Por ahora solo lee mercados y no pide ninguna clave. Para operar hará falta: {claves}.",
       legal: "Aviso legal",
       legal_nota: "Lo aceptaste al abrir la app. Puedes volver a leerlo cuando quieras.",
       legal_ver: "Ver el aviso legal",
@@ -160,7 +160,7 @@
       plataformas_nota: "Where the app trades. Keys are stored separately for each platform.",
       plat_lectura: "READ",
       plat_detalle: "Pays and settles in {moneda} · approximate minimum per order: {min} {moneda}",
-      plat_claves: "This version only reads markets and asks for no keys. Trading will need: {claves}.",
+      plat_claves: "For now it only reads markets and asks for no keys. Trading will need: {claves}.",
       legal: "Legal notice",
       legal_nota: "You accepted it when you opened the app. You can read it again at any time.",
       legal_ver: "View the legal notice",
@@ -186,7 +186,7 @@
 
   var AVISO = {
     es: [
-      ["Qué es", "Cardón Predicciones es software libre y gratuito, en versión piloto. Es una herramienta para ver y operar mercados de predicción con tu propia cuenta y, más adelante, desde tu propia nube."],
+      ["Qué es", "Cardón Predicciones es software libre y gratuito, en versión piloto. Es una herramienta para ver y operar mercados de predicción con tu propia cuenta y desde tu propia nube."],
       ["No es consejo financiero", "Nada de lo que muestra la app, ni lo que digan las inteligencias artificiales, es una recomendación de comprar o vender. No es un exchange, un bróker, un custodio ni un servicio de inversión o de asesoría financiera, fiscal o legal."],
       ["Puedes perder todo lo que pongas", "En un mercado de predicción, cada unidad paga 1 si aciertas y 0 si fallas: si fallas, pierdes todo lo que pagaste por ella. Los precios cambian rápido y puede no haber quien te compre cuando quieras vender."],
       ["Que sea legal depende de ti", "Los mercados de predicción están prohibidos o restringidos en algunos países. Cada persona es responsable de comprobar que usarlos sea legal donde vive, y de cumplir sus leyes e impuestos."],
@@ -194,7 +194,7 @@
       ["Descargo", "En la máxima medida que permita la ley, el desarrollador y los colaboradores no responden por pérdidas, daños ni perjuicios derivados del uso o de la imposibilidad de uso del software. El desarrollador no recibe, guarda ni mueve tu dinero, y no tiene acceso a tus claves."],
     ],
     en: [
-      ["What it is", "Cardón Predicciones is free, open-source software in a pilot version. It is a tool to view and trade prediction markets with your own account and, later on, from your own cloud."],
+      ["What it is", "Cardón Predicciones is free, open-source software in a pilot version. It is a tool to view and trade prediction markets with your own account and from your own cloud."],
       ["Not financial advice", "Nothing the app shows, and nothing the AI models say, is a recommendation to buy or sell. It is not an exchange, a broker, a custodian or an investment, financial, tax or legal advisory service."],
       ["You can lose everything you put in", "In a prediction market each unit pays 1 if you are right and 0 if you are wrong: if you are wrong, you lose everything you paid for it. Prices move fast and there may be nobody to buy from you when you want to sell."],
       ["Legality is up to you", "Prediction markets are banned or restricted in some countries. Each person is responsible for checking that using them is legal where they live, and for complying with local laws and taxes."],
@@ -234,6 +234,12 @@
   }
   window.I18N = {
     t: t,
+    // Cada parte de la app suma aquí sus propios textos.
+    sumar: function (mas) {
+      ["es", "en"].forEach(function (id) {
+        for (var k in mas[id] || {}) TEXTOS[id][k] = mas[id][k];
+      });
+    },
     aplicar: aplicar,
     idioma: function () {
       return idioma;

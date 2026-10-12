@@ -22,6 +22,8 @@ export interface Guardada {
   id: string;
   pregunta: string;
   ts: number;
+  /** Cuándo vence, para avisarte aunque la app esté cerrada. */
+  vence: number | null;
 }
 export type Guardadas = Record<string, Guardada>;
 
@@ -85,10 +87,10 @@ export function cerradas(guardadas: Guardadas, e: Pick<Explorado, 'mercados' | '
 }
 
 /** Marca o desmarca la estrella. Devuelve la lista nueva (no cambia la que recibe). */
-export function alternarGuardada(guardadas: Guardadas, m: { plataforma: string; id: string; pregunta: string }, ahora: number): Guardadas {
+export function alternarGuardada(guardadas: Guardadas, m: { plataforma: string; id: string; pregunta: string; vence?: number | null }, ahora: number): Guardadas {
   const out = { ...guardadas },
     k = clave(m);
   if (out[k]) delete out[k];
-  else out[k] = { plataforma: m.plataforma, id: m.id, pregunta: m.pregunta, ts: ahora };
+  else out[k] = { plataforma: m.plataforma, id: m.id, pregunta: m.pregunta, ts: ahora, vence: m.vence ?? null };
   return out;
 }

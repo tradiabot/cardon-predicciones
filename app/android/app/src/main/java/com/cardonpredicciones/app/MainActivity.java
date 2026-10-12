@@ -53,8 +53,16 @@ public class MainActivity extends Activity {
                 return dialog(message, defaultValue == null ? "" : defaultValue, result, result, true);
             }
         });
+        web.addJavascriptInterface(new Puente(this, web), "AndroidApp");
         setContentView(web, new ViewGroup.LayoutParams(-1, -1));
         web.loadUrl("file:///android_asset/web/index.html");
+        Avisos.programar(this);
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        // Al volver a la app se revisan los avisos sin esperar al vigilante periódico.
+        new Thread(() -> Avisos.revisar(getApplicationContext())).start();
     }
 
     /** Diálogo nativo para alert/confirm/prompt de la interfaz. `input` no nulo = pide un texto. */

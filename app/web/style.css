@@ -1594,3 +1594,10 @@ button:disabled {
 #aviso-ok {
   grid-column: 1/-1;
 }
+.pm-url {
+  overflow-wrap: anywhere;
+}
+#nube button,
+#avisos-panel button {
+  margin-top: 8px;
+}

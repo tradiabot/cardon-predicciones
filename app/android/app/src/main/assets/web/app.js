@@ -243,6 +243,7 @@
     })[0];
     E.guardadas = N.alternarGuardada(E.guardadas, m || E.guardadas[k], Date.now());
     B.guardar("cardon-pred-guardadas", JSON.stringify(E.guardadas));
+    window.dispatchEvent(new Event("cardon-guardadas"));
     pintar();
   }
 

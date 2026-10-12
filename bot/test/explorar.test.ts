@@ -36,7 +36,7 @@ describe('Explorador: guardadas', () => {
   it('la estrella guarda y quita, y «Guardadas» filtra', async () => {
     const m = await cargar();
     let g = alternarGuardada({}, m[0], 1000);
-    expect(g[clave(m[0])]).toEqual({ plataforma: 'hyperliquid', id: '10999', pregunta: '¿SOL ≥ 109,32 al vencer?', ts: 1000 });
+    expect(g[clave(m[0])]).toEqual({ plataforma: 'hyperliquid', id: '10999', pregunta: '¿SOL ≥ 109,32 al vencer?', ts: 1000, vence: Date.UTC(2026, 9, 12, 6, 0) });
     expect(filtrar(m, f({ categoria: 'guardadas' }), g).map((x) => x.id)).toEqual(['10999']);
     expect(contar(m, g).guardadas).toBe(1);
     g = alternarGuardada(g, m[0], 2000);
