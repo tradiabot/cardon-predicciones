@@ -70,3 +70,6 @@ table{width:100%;border-collapse:collapse;font-size:15px}th,td{text-align:left;p
 .tbl{overflow-x:auto}
 :focus-visible{outline:2px solid var(--mint);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.descarga-nota{font-size:13px;opacity:.75;margin:12px 0 0}
+.descarga-nota a{color:inherit;text-decoration:underline}
